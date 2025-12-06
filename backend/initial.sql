@@ -71,22 +71,6 @@ INSERT INTO `events` (`event_id`, `nama_acara`, `deskripsi`, `tanggal_mulai`, `t
 (3, 'Workshop React Native 2025', 'Belajar membuat aplikasi mobile dari nol sampai mahir.', '2025-12-15 09:00:00', NULL, 'Laboratorium Komputer 3', 'default_event.jpg', 'Workshop', 50000, 40, '0812-3456-7890 (Budi)', 1, '2025-11-30 03:58:57'),
 (5, 'Pameran Robotika', 'pameran robot hasil karya mahasiswa', '2025-12-30 08:00:00', NULL, 'aula fakultas teknik', '1764501136876-638753384.jpg', NULL, 25000, 100, '-', 1, '2025-11-30 11:12:16');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `event_registrations`
---
-
-CREATE TABLE `event_registrations` (
-  `registration_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `registered_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `is_reminder_set` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
 --
 -- Table structure for table `users`
 --
@@ -98,7 +82,9 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `role` enum('student','organizer') NOT NULL DEFAULT 'student',
   `avatar` varchar(255) DEFAULT 'default_avatar.png',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `reset_token` VARCHAR(255) DEFAULT NULL,
+  `reset_expires` BIGINT DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -128,14 +114,6 @@ ALTER TABLE `events`
   ADD KEY `creator_id` (`creator_id`);
 
 --
--- Indexes for table `event_registrations`
---
-ALTER TABLE `event_registrations`
-  ADD PRIMARY KEY (`registration_id`),
-  ADD UNIQUE KEY `user_id` (`user_id`,`event_id`),
-  ADD KEY `event_id` (`event_id`);
-
---
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -157,12 +135,6 @@ ALTER TABLE `bookmarks`
 --
 ALTER TABLE `events`
   MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `event_registrations`
---
-ALTER TABLE `event_registrations`
-  MODIFY `registration_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -187,13 +159,6 @@ ALTER TABLE `bookmarks`
 ALTER TABLE `events`
   ADD CONSTRAINT `events_ibfk_1` FOREIGN KEY (`creator_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
 
---
--- Constraints for table `event_registrations`
---
-ALTER TABLE `event_registrations`
-  ADD CONSTRAINT `event_registrations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `event_registrations_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`) ON DELETE CASCADE;
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

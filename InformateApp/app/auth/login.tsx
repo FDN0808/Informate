@@ -83,6 +83,14 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
+        <View style={{ width: '100%', alignItems: 'flex-end', marginBottom: 20 }}>
+          <TouchableOpacity onPress={() => router.push("/auth/resetPassword")}>
+            <Text style={{ color: '#007BFF', fontWeight: '600', fontSize: 14 }}>
+              Lupa Password?
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity style={styles.btn} onPress={handleLogin}>
           <Text style={styles.btnText}>Login</Text>
         </TouchableOpacity>
