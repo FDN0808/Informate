@@ -86,57 +86,85 @@ export default function CreateEvent() {
   };
 
   // ===== SAVE EVENT =====
-  // ===== SAVE EVENT (VERSI PERBAIKAN) =====
-  const handleSave = async () => {
-    // 1. Validasi
-    if (!form.nama_acara || !form.tanggal_mulai || !form.lokasi) {
-      Alert.alert("Validasi", "Nama acara, tanggal, dan lokasi wajib diisi.");
-      return;
+const handleSave = async () => {
+  // 1. Validasi
+  if (!form.nama_acara || !form.tanggal_mulai || !form.lokasi) {
+    Alert.alert("Validasi", "Nama acara, tanggal, dan lokasi wajib diisi.");
+    return;
+  }
+
+  setSaving(true);
+
+  try {
+    // 2. Buat FormData
+    const formData = new FormData();
+
+    // Append data text (semua harus string)
+    formData.append('nama_acara', form.nama_acara);
+    formData.append('tanggal_mulai', form.tanggal_mulai);
+    formData.append('lokasi', form.lokasi);
+    formData.append('deskripsi', form.deskripsi || '');
+    formData.append('kategori', form.kategori || 'Umum');
+    formData.append('harga_tiket', String(form.harga_tiket || '0'));
+    formData.append('kuota_maksimal', String(form.kuota_maksimal || '0'));
+    formData.append('contact_person', form.contact_person || '-');
+
+    // 3. Append gambar jika ada (CASTING KE ANY untuk hindari TypeScript error)
+    if (form.image && form.image.uri) {
+      const uriParts = form.image.uri.split('.');
+      const fileType = uriParts[uriParts.length - 1];
+
+      // React Native butuh format: { uri, name, type }
+      formData.append('banner_image', {
+        uri: Platform.OS === 'android' 
+          ? form.image.uri 
+          : form.image.uri.replace('file://', ''),
+        name: `event_${Date.now()}.${fileType}`,
+        type: `image/${fileType}`,
+      } as any); // ⬅️ Casting ke 'any' untuk bypass TypeScript
+      
+      console.log('📸 Image siap diupload');
     }
 
-    setSaving(true);
+    // 4. Kirim request (Jangan set Content-Type manual!)
+    console.log('📤 Mengirim data ke server...');
+    
+    const response = await api.post("/events", formData);
 
-    try {
-      // 2. GUNAKAN FORMDATA (WAJIB UNTUK UPLOAD GAMBAR)
-      const formData = new FormData();
+    console.log('✅ Sukses:', response.data);
 
-      // Masukkan data teks (Semua harus String)
-      formData.append('nama_acara', form.nama_acara);
-      formData.append('tanggal_mulai', form.tanggal_mulai);
-      formData.append('lokasi', form.lokasi);
-      formData.append('deskripsi', form.deskripsi || '');
-      formData.append('kategori', form.kategori || 'Umum');
-      formData.append('harga_tiket', String(form.harga_tiket || '0')); // Ubah angka jadi string
-      formData.append('kuota_maksimal', String(form.kuota_maksimal || '0'));
-      formData.append('contact_person', form.contact_person || '-');
+    Alert.alert("Sukses", "Event baru berhasil ditambahkan!");
+    router.back();
 
-      // 3. MASUKKAN FILE GAMBAR
-      if (form.image) {
-        // React Native butuh: uri, name, type
-        const uriParts = form.image.uri.split('.');
-        const fileType = uriParts[uriParts.length - 1];
-
-        formData.append('banner_image', {
-          uri: form.image.uri,
-          name: `photo.${fileType}`, // Nama file
-          type: `image/${fileType}`, // Mime type (image/jpeg atau image/png)
-        } as any); // 'as any' untuk menghindari error typescript di RN
-      }
-
-      // 4. KIRIM REQUEST
-      // Header 'Content-Type: multipart/form-data' akan otomatis diatur oleh Axios
-      // Jangan set manual!
-      await api.post("/events", formData);
-
-      Alert.alert("Sukses", "Event baru berhasil ditambahkan!");
-      router.back();
-    } catch (e: any) {
-      console.log("Error detail:", e);
-      Alert.alert("Error", "Gagal menambahkan event baru. Cek koneksi Ngrok.");
-    } finally {
-      setSaving(false);
+  } catch (error: any) {
+    console.error("❌ Error Create:", error);
+    
+    // Error handling yang lebih detail
+    let errorMessage = "Gagal menambahkan event.";
+    
+    if (error.response) {
+      // Server merespons dengan error status
+      errorMessage = error.response.data?.message || 
+                     `Server error: ${error.response.status}`;
+      console.error('📛 Server response:', error.response.data);
+    } else if (error.request) {
+      // Request dikirim tapi tidak ada respons
+      errorMessage = "Tidak ada respons dari server. Periksa:\n" +
+                     "1. Koneksi internet HP Anda\n" +
+                     "2. Ngrok masih aktif\n" +
+                     "3. Backend sedang running";
+      console.error('📛 No response received');
+    } else {
+      // Error saat setup request
+      errorMessage = error.message;
     }
-  };
+    
+    Alert.alert("Error", errorMessage);
+  } finally {
+    setSaving(false);
+  }
+};
+
   const inputStyle = [
     styles.input,
     {
