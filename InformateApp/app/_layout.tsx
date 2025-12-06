@@ -1,11 +1,14 @@
 import { ThemeProvider, useThemeMode } from "@/hooks/useTheme";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <NavigationLayout />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationLayout />
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }

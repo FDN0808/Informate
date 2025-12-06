@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type ThemeMode = "light" | "dark";
+export type ThemeMode = "light" | "dark";
 
 type ThemeContextType = {
   theme: ThemeMode;
@@ -15,9 +15,9 @@ const ThemeContext = createContext<ThemeContextType>({
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<ThemeMode>("light");
 
-  function toggleTheme() {
+  const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  }
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

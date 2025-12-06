@@ -141,7 +141,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#e8f1ff",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
   },
 
   gradientBg: {
@@ -150,7 +149,8 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: "40%",
+    width: "90%",
+    maxWidth: 420,
     paddingVertical: 40,
     paddingHorizontal: 25,
     borderRadius: 25,
