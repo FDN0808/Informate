@@ -1,5 +1,5 @@
 // app/profile.tsx
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -7,14 +7,10 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  ActivityIndicator,
-  Alert,
   StatusBar,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import api from "../src/api";
 import { useThemeMode } from "@/hooks/useTheme";
 import { Colors } from "@/constants/colors";
 
@@ -23,39 +19,12 @@ export default function ProfileScreen() {
   const { theme, toggleTheme } = useThemeMode();
   const c = Colors[theme];
 
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  // === GET PROFILE DARI BACKEND ===
-  const getProfile = async () => {
-    try {
-      const res = await api.get("/auth/me"); // <-- sudah sesuai API
-      setUser(res.data.data); // { user_id, nama, email, avatar, role }
-    } catch (e) {
-      console.log("Profile load error:", e);
-      Alert.alert("Error", "Gagal memuat profile.");
-    } finally {
-      setLoading(false);
-    }
+  // contoh dummy user (nanti bisa dihubungkan ke backend)
+  const user = {
+    name: "Nama Pengguna",
+    email: "user@mail.com",
+    avatar: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
   };
-
-  useEffect(() => {
-    getProfile();
-  }, []);
-
-  // === LOGOUT ===
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem("userToken");
-    router.replace("/auth/login");
-  };
-
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
 
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
@@ -63,7 +32,7 @@ export default function ProfileScreen() {
         barStyle={theme === "dark" ? "light-content" : "dark-content"}
       />
 
-      {/* HEADER */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={22} color={c.text} />
@@ -80,25 +49,17 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
-        {/* USER INFO */}
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        {/* User info */}
         <View style={styles.profileSection}>
-          <Image
-            source={{
-              uri:
-                user?.avatar ||
-                `https://ui-avatars.com/api/?background=random&name=${user?.nama}`,
-            }}
-            style={styles.avatar}
-          />
-
-          <Text style={[styles.name, { color: c.text }]}>{user?.nama}</Text>
+          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          <Text style={[styles.name, { color: c.text }]}>{user.name}</Text>
           <Text style={[styles.email, { color: c.secondaryText }]}>
-            {user?.email}
+            {user.email}
           </Text>
         </View>
 
-        {/* MENU */}
+        {/* Menu section */}
         <View style={styles.menuWrapper}>
           <MenuItem
             icon="bookmark-outline"
@@ -106,18 +67,17 @@ export default function ProfileScreen() {
             color={c.text}
             onPress={() => router.push("/bookmark")}
           />
-
           <MenuItem
             icon="color-palette-outline"
-            label="Ganti Tema"
+            label="Switch Theme"
             color={c.text}
             onPress={toggleTheme}
           />
         </View>
 
-        {/* LOGOUT */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={20} color="#fff" />
+        {/* Logout */}
+        <TouchableOpacity style={styles.logoutBtn}>
+          <Ionicons name="log-out-outline" size={20} color="#ef4444" />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -125,7 +85,7 @@ export default function ProfileScreen() {
   );
 }
 
-/* MENU ITEM COMPONENT */
+/* COMPONENT: Menu Item */
 const MenuItem = ({ icon, label, color, onPress }: any) => (
   <TouchableOpacity style={styles.menuItem} onPress={onPress}>
     <Ionicons name={icon} size={20} color={color} />
@@ -134,14 +94,12 @@ const MenuItem = ({ icon, label, color, onPress }: any) => (
       name="chevron-forward"
       size={20}
       color={color}
-      style={{ opacity: 0.4 }}
+      style={{ opacity: 0.5 }}
     />
   </TouchableOpacity>
 );
 
-/* ====================
-   STYLES
-   ==================== */
+/* STYLES */
 const styles = StyleSheet.create({
   container: { flex: 1 },
 
@@ -154,41 +112,70 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  backBtn: { padding: 8 },
+  backBtn: {
+    padding: 8,
+    borderRadius: 8,
+  },
 
-  headerTitle: { fontSize: 20, fontWeight: "700" },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
 
-  profileSection: { alignItems: "center", marginTop: 10 },
+  profileSection: {
+    alignItems: "center",
+    marginTop: 10,
+    paddingBottom: 20,
+  },
 
-  avatar: { width: 110, height: 110, borderRadius: 55, marginBottom: 14 },
+  avatar: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    marginBottom: 14,
+  },
 
-  name: { fontSize: 22, fontWeight: "800" },
+  name: {
+    fontSize: 22,
+    fontWeight: "800",
+  },
 
-  email: { fontSize: 14, marginTop: 2 },
+  email: {
+    fontSize: 14,
+    marginTop: 2,
+  },
 
-  menuWrapper: { marginTop: 25, paddingHorizontal: 16 },
+  menuWrapper: {
+    marginTop: 20,
+    paddingHorizontal: 16,
+  },
 
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderColor: "rgba(0,0,0,0.1)",
+    borderColor: "rgba(0,0,0,0.07)",
   },
 
-  menuLabel: { flex: 1, marginLeft: 12, fontSize: 16, fontWeight: "600" },
+  menuLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    flex: 1,
+    marginLeft: 12,
+  },
 
   logoutBtn: {
-    marginTop: 40,
-    marginHorizontal: 40,
-    paddingVertical: 14,
-    borderRadius: 14,
-    backgroundColor: "#ef4444",
+    marginTop: 30,
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
+    alignSelf: "center",
     gap: 6,
   },
 
-  logoutText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  logoutText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#ef4444",
+  },
 });
