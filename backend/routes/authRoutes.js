@@ -5,6 +5,8 @@ const authController = require('../controllers/authController');
 const resetController = require('../controllers/resetController'); 
 const { check } = require('express-validator');
 
+
+router.get('/me', authMiddleware, authController.getMe);
 // Endpoint: /api/auth/register
 router.post('/register', [
     check('nama', 'Nama tidak boleh kosong').not().isEmpty(),

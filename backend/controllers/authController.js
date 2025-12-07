@@ -108,3 +108,27 @@ exports.login = async (req, res) => {
         });
     }
 };
+
+exports.getMe = async (req, res) => {
+    try {
+        // req.user.id didapat dari authMiddleware (hasil decode token)
+        const userId = req.user.id;
+
+        const [users] = await db.query(
+            'SELECT user_id, nama, email, role FROM users WHERE user_id = ?', 
+            [userId]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'User tidak ditemukan' });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: users[0]
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    }
+};
