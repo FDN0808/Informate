@@ -36,7 +36,13 @@ type Props = {
 
 export default function EventCard({
   event,
-  themeColors,
+  themeColors = {
+    background: "#fff",
+    text: "#000",
+    card: "#f8f8f8",
+    border: "#ddd",
+    secondaryText: "#666",
+  },
   bookmarked = false,
   onPress,
   onBookmarkChange,
