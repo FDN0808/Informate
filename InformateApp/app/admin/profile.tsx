@@ -75,7 +75,7 @@ export default function ProfileScreen() {
             onPress={() =>
               // Mengarah ke file di folder auth, sambil membawa email user
               router.push({
-                pathname: "/auth/resetPassword",
+                pathname: "./auth/resetPassword",
                 params: { email: userEmail }
               })
             }

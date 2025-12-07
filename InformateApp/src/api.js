@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_URL = 'https://cutest-laura-overfrugally.ngrok-free.dev/api';
+export const API_URL = 'https://informate-production.up.railway.app/api';
 
 // Helper: Build headers
 const getHeaders = async (isFormData = false) => {
