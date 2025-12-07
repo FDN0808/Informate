@@ -97,45 +97,27 @@ exports.getCategories = async (req, res) => {
         res.status(500).json({ success: false, message: 'Gagal ambil kategori', error: error.message });
     }
 };
-
 exports.getEventById = async (req, res) => {
     try {
         const { id } = req.params;
+        const [rows] = await db.query(SELECT * FROM events WHERE event_id = ?, [id]);
 
-        const query = `
-            SELECT 
-                e.*, 
-                u.nama AS nama_creator 
-            FROM events e
-            LEFT JOIN users u ON e.creator_id = u.user_id
-            WHERE e.event_id = ?
-        `;
-
-        const [rows] = await db.query(query, [id]);
-
-        if (rows.length === 0) {
-            return res.status(404).json({ message: 'Event tidak ditemukan' });
-        }
+        if (rows.length === 0) return res.status(404).json({ message: 'Tak ditemukan' });
 
         const event = rows[0];
-
-        const protocol = req.protocol;
-        const host = req.get('host');
-        const fullImageUrl = event.banner_image 
-            ? `${protocol}://${host}/uploads/${event.banner_image}` 
-            : null;
+        
+        // Kirim image_url langsung dari banner_image (karena sekarang isinya Base64)
         const eventData = {
             ...event,
-            image_url: fullImageUrl
+            image_url: event.banner_image // <--- INI KUNCINYA
         };
 
         res.status(200).json({
             success: true,
             data: eventData
         });
-
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+        res.status(500).json({ message: 'Error', error: error.message });
     }
 };
 
