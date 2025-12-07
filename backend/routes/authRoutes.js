@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-// 1. IMPORT CONTROLLER BARU (Tambahkan baris ini)
+const authMiddleware = require('../middleware/authMiddleware');
 const resetController = require('../controllers/resetController'); 
 const { check } = require('express-validator');
 
