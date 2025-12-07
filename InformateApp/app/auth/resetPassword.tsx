@@ -71,7 +71,7 @@ export default function ResetPassword() {
                         text: "Masukkan Token",
                         onPress: () => {
                             // Arahkan ke halaman input token & password baru
-                            router.push("/auth/newPassword");
+                            router.push("./auth/newPassword");
                         }
                     },
                 ]
